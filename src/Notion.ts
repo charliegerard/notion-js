@@ -23,6 +23,10 @@ import { DeviceInfo } from "./types/info";
 import { DeviceStatus } from "./types/status";
 import { Action } from "./types/actions";
 
+const defaultOptions = {
+  transport: "online"
+};
+
 /**
  * Example
  * ```typescript
@@ -68,7 +72,10 @@ export class Notion {
    * @param options
    */
   constructor(options: NotionOptions) {
-    this.options = Object.freeze(options);
+    this.options = Object.freeze({
+      ...defaultOptions,
+      ...options
+    });
     this.api = new ApiClient(this.options);
 
     if (!this.options.deviceId) {

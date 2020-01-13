@@ -103,9 +103,7 @@ export const createDeviceStore = (app, deviceId, SERVER_TIMESTAMP) => {
     lastOfChildValue,
     onNamespace: (namespace: string, callback: Function): Function => {
       return on("value", namespace, (data: any) => {
-        if (data !== null) {
-          callback(data);
-        }
+        callback(data);
       });
     },
     offNamespace: (namespace: string, listener: Function): void => {
@@ -172,7 +170,7 @@ export const createDeviceStore = (app, deviceId, SERVER_TIMESTAMP) => {
 
       return subscriptionCreated;
     },
-    unsubscribFromMetric: (subscription, listener: Function) => {
+    unsubscribeFromMetric: (subscription, listener: Function) => {
       off("value", listener);
       remove(`subscriptions/${subscription.id}`);
     }
