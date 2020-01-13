@@ -170,9 +170,15 @@ export const createDeviceStore = (app, deviceId, SERVER_TIMESTAMP) => {
 
       return subscriptionCreated;
     },
-    unsubscribeFromMetric: (subscription, listener: Function) => {
-      off("value", listener);
+    unsubscribeFromMetric: subscription => {
       remove(`subscriptions/${subscription.id}`);
+    },
+    removeMetricListener(subscription, listener: Function) {
+      const { atomic, metric, labels } = subscription;
+      const child = atomic
+        ? `metrics/${metric}`
+        : `metrics/${metric}/${labels[0]}`;
+      off(child, "value", listener);
     }
   };
 };

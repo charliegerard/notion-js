@@ -42,14 +42,12 @@ export class ApiClient implements Client {
       });
     }
 
-    this.initWebsocket();
+    if (this.options.transport === "offline") {
+      this.initWebsocket();
+    }
   }
 
   private initWebsocket() {
-    if (this.options.transport !== "offline") {
-      return;
-    }
-
     if (this.options.onDeviceSocketUrl) {
       this.websocket = new WebsocketClient({
         deviceId: this.options.deviceId,
@@ -157,8 +155,8 @@ export class ApiClient implements Client {
       },
       subscribe: subscription => {
         const serverType = isOfflineMetric(subscription.metric)
-          ? this.websocket.serverType
-          : this.firebase.serverType;
+          ? WebsocketClient.serverType
+          : FirebaseClient.serverType;
 
         const subscriptionCreated = this.firebase.subscribeToMetric({
           ...subscription,
@@ -167,7 +165,13 @@ export class ApiClient implements Client {
         return subscriptionCreated;
       },
       unsubscribe: (subscription, listener): void => {
-        this.firebase.unsubscribeFromMetric(subscription, listener);
+        if (isOfflineMetric(subscription.metric)) {
+          this.websocket.removeMetricListener(subscription, listener);
+        } else {
+          this.firebase.removeMetricListener(subscription, listener);
+        }
+
+        this.firebase.unsubscribeFromMetric(subscription);
       }
     };
   }
